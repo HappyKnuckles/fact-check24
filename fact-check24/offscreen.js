@@ -33,6 +33,7 @@ chrome.runtime.onMessage.addListener((msg) => {
       // Create ScriptProcessor to access raw audio data
       const processor = audioCtx.createScriptProcessor(4096, 1, 1);
 
+
       processor.onaudioprocess = (e) => {
         const inputBuffer = e.inputBuffer.getChannelData(0); // Mono channel
         const bits = Array.from(inputBuffer).map((sample) => {
