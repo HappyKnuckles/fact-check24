@@ -7,6 +7,7 @@
 //     enabled: true,
 //   });
 // });
+"use strict";
 
 // Allows users to open the side panel by clicking on the action toolbar icon
 chrome.sidePanel
@@ -76,6 +77,3 @@ chrome.commands.onCommand.addListener(async (command) => {
     });
   }
 });
-
-
-
