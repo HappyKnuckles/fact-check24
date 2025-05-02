@@ -2,7 +2,7 @@
   background-repeat: no-repeat;
   background-position: bottom 10px right 10px;
   background-size: 30px;
-  box-shadow: 0 4px 12px var(--card-shadow);
+  /* box-shadow: 0 4px 12px var(--card-shadow); */
   border-radius: var(--card-radius);
   padding: var(--padding);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -20,11 +20,11 @@
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 6px 18px var(--card-shadow);
+  /* box-shadow: 0 6px 18px var(--card-shadow); */
 }
 
 .fact-title {
-  font-size: 1rem;
+  font-size: .9rem;
   font-style: italic;
   line-height: 1.35;
   margin: 0 0 8px;
