@@ -1,7 +1,6 @@
 
 
 chrome.runtime.onMessage.addListener((msg) => {
-  console.log('📩 Nachricht empfangen:', msg);
   if(msg.type !== 'audio-bits') return;
   log(msg.bits.slice(0, 10).join(' '));
 }
