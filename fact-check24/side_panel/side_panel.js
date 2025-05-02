@@ -1,36 +1,43 @@
-document.getElementById('start-check').addEventListener('click', () => {
-  // Erfasse nur Audio, kein Video
-  chrome.tabCapture.capture(
-    { audio: true, video: false }, // CaptureOptions → audio: true :contentReference[oaicite:12]{index=12}
-    (stream) => {
-      if (chrome.runtime.lastError) {
-        console.error('Capture-Fehler:', chrome.runtime.lastError.message);
-        return;
-      }
-      // stream ist vom Typ LocalMediaStream (MediaStream)
-      handleAudioStream(stream);
-    }
-  );
-});
-function handleAudioStream(stream) {
-  const audioContext = new AudioContext();
-  const source = audioContext.createMediaStreamSource(stream);
-  source.connect(audioContext.destination);
-  console.log('Audio-Capture läuft und wird wiedergegeben');
+
+
+chrome.runtime.onMessage.addListener((msg) => {
+  if(msg.type !== 'audio-bits') return;
+  log(msg.bits.slice(0, 10).join(' '));
 }
+);
 
-chrome.runtime.onMessage.addListener((msg, sender) => {
-  if (msg === 'capture-audio') {
-    chrome.tabCapture.capture({ audio: true, video: false }, (stream) => {
-      if (chrome.runtime.lastError) {
-        console.error('Capture-Fehler:', chrome.runtime.lastError.message);
-        return;
+
+  function log(msg) {
+    const div = document.getElementById('fact'); 
+
+    if (div) {
+ 
+
+      const p = document.createElement('p');
+ 
+
+      p.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+ 
+
+      while (div.childNodes.length > 20) {
+ 
+
+        div.removeChild(div.firstChild);
+ 
+
       }
-      const audioContext = new AudioContext();
-      const source = audioContext.createMediaStreamSource(stream);
-      source.connect(audioContext.destination);
-      console.log('Audio-Capture im Sidepanel läuft');
-    });
-  }
-});
+ 
 
+      div.appendChild(p);
+ 
+
+      div.scrollTop = div.scrollHeight;
+ 
+
+    } else {
+ 
+
+      console.log('Log element not found in side panel.');
+ 
+
+    }}
