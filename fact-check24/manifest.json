@@ -4,7 +4,6 @@
   "version": "1.0",
   "manifest_version": 3,
   "permissions": ["tabCapture", "activeTab", "storage", "sidePanel", "offscreen"],
-  "host_permissions": ["<all_urls>"],
   "side_panel": {
     "default_path": "side_panel/side_panel.html"
   },
@@ -18,11 +17,5 @@
       },
       "description": "Starte Audio-Capture des aktuellen Tabs"
     }
-  },
-   "web_accessible_resources": [
-    {
-      "resources": ["offscreen.html","offscreen.js"],
-      "matches": ["<all_urls>"]
-    }
-  ]
+  }
 }

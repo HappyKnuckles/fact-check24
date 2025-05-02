@@ -43,6 +43,10 @@ chrome.runtime.onMessage.addListener((msg) => {
         });
 
         console.log('🎧 Audio Bits:', bits.slice(0, 10).join(' '), '...');
+        chrome.runtime.sendMessage({
+          type: 'audio-bits',
+          bits: bits,
+        });
       };
 
       src.connect(processor);
@@ -52,3 +56,5 @@ chrome.runtime.onMessage.addListener((msg) => {
     })
     .catch((err) => console.error('Offscreen getUserMedia-Fehler:', err));
 });
+
+

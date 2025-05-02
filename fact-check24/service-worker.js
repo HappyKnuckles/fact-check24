@@ -20,7 +20,8 @@ chrome.sidePanel
 // Shortcut-Listener
 chrome.commands.onCommand.addListener(async (command) => {
   if (command !== "capture-audio") return;
-
+  const existingContexts = await chrome.runtime.getContexts({});
+  console.log("Vorhandene Kontexte:", existingContexts);
   // Aktiven Tab ermitteln
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.id) return;
@@ -30,16 +31,22 @@ chrome.commands.onCommand.addListener(async (command) => {
   console.log("Stream-ID erhalten:", streamId);
 
   // Offscreen-Dokument erstellen, falls nicht vorhanden
- const offscreenUrl = chrome.runtime.getURL('offscreen.html');
- await chrome.offscreen.createDocument({
-   url: offscreenUrl,
-   reasons: [chrome.offscreen.Reason.USER_MEDIA],
-   justification: 'Audio-Capture',
- });
+  const offscreenDocument = existingContexts.find(
+    (c) => c.contextType === 'OFFSCREEN_DOCUMENT'
+  );
+  console.log("Offscreen-Dokument vorhanden:", offscreenDocument);
+   if (!offscreenDocument) {
+     // Create an offscreen document.
+     await chrome.offscreen.createDocument({
+       url: 'offscreen.html',
+       reasons: ['USER_MEDIA'],
+       justification: 'Recording from chrome.tabCapture API',
+     });
+   } 
 
 
   // Stream-ID an das Offscreen-Dokument senden
   console.log("Stream-ID an Offscreen-Dokument senden:", streamId);
-  chrome.runtime.sendMessage({ type: "start-capture", streamId });
+  chrome.runtime.sendMessage({ type: "start-capture", target: 'offscreen', streamId });
 });
 
