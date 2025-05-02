@@ -3,15 +3,26 @@
   "description": "Live video fact-checking tool as a browser extension.",
   "version": "1.0",
   "manifest_version": 3,
-  "permissions": ["tabCapture", "activeTab", "storage", "sidePanel"],
+  "permissions": ["tabCapture", "activeTab", "storage", "sidePanel", "offscreen"],
   "host_permissions": ["<all_urls>"],
-  "action": {
-    "default_title": "Click to open extension"
-  },
   "side_panel": {
     "default_path": "side_panel/side_panel.html"
   },
   "background": {
     "service_worker": "service-worker.js"
-  }
+  },
+  "commands": {
+    "capture-audio": {
+      "suggested_key": {
+        "default": "Ctrl+B"
+      },
+      "description": "Starte Audio-Capture des aktuellen Tabs"
+    }
+  },
+   "web_accessible_resources": [
+    {
+      "resources": ["offscreen.html","offscreen.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
