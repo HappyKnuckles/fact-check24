@@ -146,16 +146,8 @@ function addFactCard(
       sourceA.title = url; // Show full URL on hover
       sourceA.style.color = 'inherit'; // Inherit color
       sourceA.style.textDecoration = 'underline'; // Make it look like a link
-
-      // Display hostname or fallback to full URL
-      try {
-        const urlObject = new URL(url);
-        // Limit displayed hostname length if needed
-        sourceA.textContent = urlObject.hostname.length > 30 ? urlObject.hostname.substring(0, 27) + '...' : urlObject.hostname;
-      } catch (e) {
-        // Limit displayed URL length if it's not a valid URL structure
-         sourceA.textContent = url.length > 30 ? url.substring(0, 27) + '...' : url;
-      }
+      sourceA.textContent = url; // Display the URL text
+ 
 
       sourcesSpan.appendChild(sourceA);
 
