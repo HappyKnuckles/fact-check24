@@ -28,9 +28,35 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 function connectToWebSocket() {
   // establish a WS connection
   ws = new WebSocket("ws://localhost:3000/ws");
+  ws.binaryType = "arraybuffer";
 
   ws.addEventListener("open", () => {
     console.log("WebSocket connected to ws://localhost:3000/ws");
+  });
+
+  ws.addEventListener("message", (event) => {
+    // all your server messages are JSON, so:
+    let msg;
+    try {
+      msg = JSON.parse(event.data);
+    } catch (err) {
+      console.warn("Non-JSON ws message:", event.data);
+      return;
+    }
+
+    if (msg.transcript) {
+      console.log("🗣️ Transcript from server:", msg.transcript);
+
+      // if you want to forward it back through the extension messaging:
+      chrome.runtime.sendMessage({
+        target: "audio-transcript",
+        type: "transcript",
+        transcript: msg.transcript,
+      });
+    }
+    if (msg.error) {
+      console.error("Server error:", msg.error);
+    }
   });
 
   ws.addEventListener("error", (err) => {
@@ -66,20 +92,24 @@ function startCapture(streamId) {
 
       processor = audioCtx.createScriptProcessor(4096, 1, 1);
       processor.onaudioprocess = (e) => {
-        const inputBuffer = e.inputBuffer.getChannelData(0);
-        const bits = Array.from(inputBuffer).map((sample) => {
-          const intSample = Math.max(-1, Math.min(1, sample)) * 32767;
-          const int16 = intSample | 0;
-          return int16.toString(2).padStart(16, "0");
-        });
+        const input = e.inputBuffer.getChannelData(0);
+        const int16 = new Int16Array(input.length);
 
+        for (let i = 0; i < input.length; i++) {
+          const s = Math.max(-1, Math.min(1, input[i]));
+          // scale to int16 range
+          int16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+        }
+
+        // send over chrome.runtime
         chrome.runtime.sendMessage({
           type: "audio-bits",
-          bits: bits,
+          bits: Array.from(int16),
         });
+
         // also send over WebSocket
         if (ws && ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify(bits));
+          ws.send(int16.buffer);
         }
       };
 
