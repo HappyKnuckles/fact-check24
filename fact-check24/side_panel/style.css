@@ -52,7 +52,7 @@ button[disabled] {
 
 .stats-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem; /* spacing between columns */
   width: 100%; /* full-width */
   max-width: 600px; /* or whatever fits your design */
@@ -64,7 +64,7 @@ button[disabled] {
   background: #ffffff;
   border-radius: 8px;
   padding: 1rem;
-  text-align: left; /* center “True” + “0” vertically & horizontally */
+  text-align: center; /* center “True” + “0” vertically & horizontally */
 }
 
 .stat h2 {

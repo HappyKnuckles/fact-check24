@@ -2,24 +2,55 @@
 //   if (msg.type !== "audio-bits") return;
 //   // log(msg.bits.slice(0, 10).join(" "));
 // });
+let wrongCounter = 0;
+let rightCounter = 0;
 
-chrome.runtime.onMessage.addListener(({ target, type, transcript }) => {
-  if (target === "audio-transcript" && type === "transcript") {
-    const outputElement = document.querySelector("#audio-transcript-output");
-    if (outputElement) {
-      outputElement.textContent += transcript;
+chrome.runtime.onMessage.addListener(({ target, type, factCheckMessage }) => {
+  if (target === 'audio-transcript' && type === 'transcript') {
+    // const outputElement = document.querySelector("#audio-transcript-output");
+    // if (outputElement) {
+    //   outputElement.textContent += transcript;
+    // }
+    console.log('Received transcript:', factCheckMessage);
+    if (factCheckMessage.verified !== 'no_fact_found') {
+      console.log("checked message", factCheckMessage);
+      let cardClass = 'card-false';
+      if (factCheckMessage.verified === 'verified_fact') {
+        cardClass = 'card-true';
+        updateCounter('right');
+      } else {
+        updateCounter('wrong');
+      }
+      addFactCard(
+        factCheckMessage.corrected,
+        factCheckMessage.statement,
+        factCheckMessage.sources,
+        cardClass
+      );
     }
-    addFactCard(transcript);
   }
 });
 
-const languageSelect = document.getElementById("language-select");
-languageSelect.addEventListener("change", () => {
-  chrome.runtime.sendMessage({
-    type: "set-language",
-    languageCode: languageSelect.value,
-  });
-});
+// ...existing code...
+function updateCounter(counter){
+  if(counter === 'wrong'){
+    wrongCounter++;
+    document.getElementById('false-count').textContent = wrongCounter;
+  }
+  else if(counter === 'right'){
+    rightCounter++;
+    document.getElementById('true-count').textContent = rightCounter;
+  }
+  let fullCounter = wrongCounter + rightCounter;
+
+  // Calculate percentages, handling division by zero
+  const truePercent = fullCounter === 0 ? 0 : Math.round((rightCounter / fullCounter) * 100);
+  const falsePercent = fullCounter === 0 ? 0 : Math.round((wrongCounter / fullCounter) * 100);
+
+  // Update the percentage display elements
+  document.getElementById('true').textContent = truePercent + '%';
+  document.getElementById('false').textContent = falsePercent + '%';
+}
 
 /**
  * Adds a fact card to the container in the side panel.
