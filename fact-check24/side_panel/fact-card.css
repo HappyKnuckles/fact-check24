@@ -10,12 +10,10 @@
 
 .card.card-true {
   background-color: var(--true-color);
-  background-image: url("/assets/thumb_up.svg");
 }
 
 .card.card-false {
   background-color: var(--false-color);
-  background-image: url("/assets/thumb_down.svg");
 }
 
 .card:hover {
