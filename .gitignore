@@ -21,6 +21,7 @@ build/
 
 # VSCode
 .vscode/
+.idea/
 
 # Env files
 .env
