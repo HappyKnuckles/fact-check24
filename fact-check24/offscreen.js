@@ -113,9 +113,9 @@ function startCapture(streamId) {
         }
       };
 
-      src.connect(processor);
-      processor.connect(audioCtx.destination);
-    })
+    src.connect(processor);
+    src.connect(audioCtx.destination);
+    processor.connect(audioCtx.destination);    })
     .catch((err) => console.error("Offscreen getUserMedia-Fehler:", err));
 }
 
