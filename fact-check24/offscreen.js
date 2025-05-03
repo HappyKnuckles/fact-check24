@@ -4,17 +4,27 @@ let processor;
 let stream;
 
 let isRecording = false;
+
+let currentLanguage = "en-US";
+
+
 chrome.runtime.sendMessage({ type: "offscreen-ready" });
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.target === "offscreen") {
+    if (msg.languageCode) {
+      currentLanguage = msg.languageCode;
+    }
     switch (msg.type) {
+      case "set-language":
+        currentLanguage = handleLanguageSwitch(msg);
+        break;
       case "is-recording":
         sendResponse({ recording: isRecording });
         return true;
       case "start-capture":
         isRecording = true;
-        connectToWebSocket();
+        connectToWebSocket(currentLanguage);
         startCapture(msg.streamId);
         break;
       case "stop-capture":
@@ -25,13 +35,18 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 });
 
-function connectToWebSocket() {
+
+function connectToWebSocket(lang) {
   // establish a WS connection
   ws = new WebSocket("ws://localhost:3000/ws");
-  ws.binaryType = "arraybuffer";
 
   ws.addEventListener("open", () => {
-    console.log("WebSocket connected to ws://localhost:3000/ws");
+    sendWS(
+      JSON.stringify({
+        type: "set-language",
+        languageCode: lang,
+      })
+    );
   });
 
   ws.addEventListener("message", (event) => {
@@ -101,22 +116,28 @@ function startCapture(streamId) {
           int16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
         }
 
-        // send over chrome.runtime
-        chrome.runtime.sendMessage({
-          type: "audio-bits",
-          bits: Array.from(int16),
-        });
-
-        // also send over WebSocket
+        // send over WebSocket
         if (ws && ws.readyState === WebSocket.OPEN) {
-          ws.send(int16.buffer);
+          sendWS(int16.buffer);
         }
       };
 
-    src.connect(processor);
-    src.connect(audioCtx.destination);
-    processor.connect(audioCtx.destination);    })
+      src.connect(processor);
+      src.connect(audioCtx.destination);
+      processor.connect(audioCtx.destination);
+    })
     .catch((err) => console.error("Offscreen getUserMedia-Fehler:", err));
+}
+
+function sendWS(msg) {
+  if (msg.type === "set-language") {
+    // send text
+    ws.send(msg);
+    // ws.send(JSON.stringify(msg));
+  } else {
+    // send binary
+    ws.send(msg);
+  }
 }
 
 function stopCapture() {

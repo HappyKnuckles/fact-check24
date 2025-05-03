@@ -3,27 +3,22 @@
 //   // log(msg.bits.slice(0, 10).join(" "));
 // });
 
-chrome.runtime.onMessage.addListener(({ target, type, factCheckMessage }) => {
-  if (target === 'audio-transcript' && type === 'transcript') {
-    // const outputElement = document.querySelector("#audio-transcript-output");
-    // if (outputElement) {
-    //   outputElement.textContent += transcript;
-    // }
-    console.log('Received transcript:', factCheckMessage);
-    if (factCheckMessage.verified !== 'no_fact_found') {
-      console.log("checked message", factCheckMessage);
-      let cardClass = 'card-false';
-      if (factCheckMessage.verified === 'verified_fact') {
-        cardClass = 'card-true';
-      }
-      addFactCard(
-        factCheckMessage.corrected,
-        factCheckMessage.statement,
-        factCheckMessage.sources,
-        cardClass
-      );
+chrome.runtime.onMessage.addListener(({ target, type, transcript }) => {
+  if (target === "audio-transcript" && type === "transcript") {
+    const outputElement = document.querySelector("#audio-transcript-output");
+    if (outputElement) {
+      outputElement.textContent += transcript;
     }
+    addFactCard(transcript);
   }
+});
+
+const languageSelect = document.getElementById("language-select");
+languageSelect.addEventListener("change", () => {
+  chrome.runtime.sendMessage({
+    type: "set-language",
+    languageCode: languageSelect.value,
+  });
 });
 
 /**
@@ -40,7 +35,7 @@ function addFactCard(
   sourceUrls = ['#'],
   cardClass = 'card-true'
 ) {
-  const container = document.getElementById('cards-container');
+  const container = document.getElementById("cards-container");
 
   if (container) {
     const cardDiv = document.createElement('div');
@@ -164,7 +159,7 @@ function addFactCard(
 
   } else {
     console.error(
-      'Card container element (#cards-container) not found in side panel.'
+      "Card container element (#cards-container) not found in side panel."
     );
   }
 }
