@@ -4,19 +4,20 @@ let processor;
 let stream;
 
 let isRecording = false;
-chrome.runtime.sendMessage({ type: 'offscreen-ready' });
+chrome.runtime.sendMessage({ type: "offscreen-ready" });
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg.target === 'offscreen') {
+  if (msg.target === "offscreen") {
     switch (msg.type) {
-      case 'is-recording':
+      case "is-recording":
         sendResponse({ recording: isRecording });
         return true;
-      case 'start-capture':
+      case "start-capture":
         isRecording = true;
+        connectToWebSocket();
         startCapture(msg.streamId);
         break;
-      case 'stop-capture':
+      case "stop-capture":
         isRecording = false;
         stopCapture();
         break;
@@ -24,9 +25,27 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 });
 
+function connectToWebSocket() {
+  // establish a WS connection
+  ws = new WebSocket("ws://localhost:3000/ws");
+
+  ws.addEventListener("open", () => {
+    console.log("WebSocket connected to ws://localhost:3000/ws");
+  });
+
+  ws.addEventListener("error", (err) => {
+    console.error("WebSocket error:", err);
+  });
+
+  ws.addEventListener("close", () => {
+    console.log("WebSocket closed");
+    ws = null;
+  });
+}
+
 function startCapture(streamId) {
-  if (recorder?.state === 'recording') {
-    throw new Error('Recorder is already recording');
+  if (recorder?.state === "recording") {
+    throw new Error("Recorder is already recording");
   }
 
   navigator.mediaDevices
@@ -34,7 +53,7 @@ function startCapture(streamId) {
       video: false,
       audio: {
         mandatory: {
-          chromeMediaSource: 'tab',
+          chromeMediaSource: "tab",
           chromeMediaSourceId: streamId,
         },
       },
@@ -51,20 +70,23 @@ function startCapture(streamId) {
         const bits = Array.from(inputBuffer).map((sample) => {
           const intSample = Math.max(-1, Math.min(1, sample)) * 32767;
           const int16 = intSample | 0;
-          return int16.toString(2).padStart(16, '0');
+          return int16.toString(2).padStart(16, "0");
         });
 
         chrome.runtime.sendMessage({
-          type: 'audio-bits',
+          type: "audio-bits",
           bits: bits,
         });
+        // also send over WebSocket
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify(bits));
+        }
       };
 
       src.connect(processor);
       processor.connect(audioCtx.destination);
-
     })
-    .catch((err) => console.error('Offscreen getUserMedia-Fehler:', err));
+    .catch((err) => console.error("Offscreen getUserMedia-Fehler:", err));
 }
 
 function stopCapture() {
@@ -82,5 +104,11 @@ function stopCapture() {
   if (audioCtx) {
     audioCtx.close();
     audioCtx = null;
+  }
+
+  // close WS if open
+  if (ws) {
+    ws.close();
+    ws = null;
   }
 }
