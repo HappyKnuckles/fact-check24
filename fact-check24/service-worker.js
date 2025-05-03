@@ -8,6 +8,8 @@
 //   });
 // });
 
+let currentLanguage = "en-US"; // Default language
+
 // Allows users to open the side panel by clicking on the action toolbar icon
 chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })
@@ -16,25 +18,32 @@ chrome.sidePanel
 let offscreenReady = false;
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg.type === 'offscreen-ready') {
+  if (msg.type === "set-language" && msg.languageCode) {
+    currentLanguage = msg.languageCode;
+    console.log("📣 language set to", currentLanguage);
+  }
+});
+
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg.type === "offscreen-ready") {
     offscreenReady = true;
   }
 });
 
 chrome.commands.onCommand.addListener(async (command) => {
-  if (command !== 'capture-audio') return;
+  if (command !== "capture-audio") return;
 
   const recording = await new Promise((resolve) => {
     chrome.runtime.sendMessage(
-      { type: 'is-recording', target: 'offscreen' },
+      { type: "is-recording", target: "offscreen" },
       (response) => resolve(response?.recording === true)
     );
   });
 
   if (recording) {
     chrome.runtime.sendMessage({
-      type: 'stop-capture',
-      target: 'offscreen',
+      type: "stop-capture",
+      target: "offscreen",
     });
   } else {
     const [tab] = await chrome.tabs.query({
@@ -49,18 +58,18 @@ chrome.commands.onCommand.addListener(async (command) => {
 
     const contexts = await chrome.runtime.getContexts({});
     const offscreenDoc = contexts.find(
-      (c) => c.contextType === 'OFFSCREEN_DOCUMENT'
+      (c) => c.contextType === "OFFSCREEN_DOCUMENT"
     );
     if (!offscreenDoc) {
       await chrome.offscreen.createDocument({
-        url: 'offscreen.html',
-        reasons: ['USER_MEDIA'],
-        justification: 'Recording from chrome.tabCapture API',
+        url: "offscreen.html",
+        reasons: ["USER_MEDIA"],
+        justification: "Recording from chrome.tabCapture API",
       });
 
       await new Promise((resolve) => {
         const listener = (m) => {
-          if (m.type === 'offscreen-ready') {
+          if (m.type === "offscreen-ready") {
             chrome.runtime.onMessage.removeListener(listener);
             resolve();
           }
@@ -70,12 +79,10 @@ chrome.commands.onCommand.addListener(async (command) => {
     }
 
     chrome.runtime.sendMessage({
-      type: 'start-capture',
-      target: 'offscreen',
+      type: "start-capture",
+      target: "offscreen",
       streamId,
+      languageCode: currentLanguage,
     });
   }
 });
-
-
-

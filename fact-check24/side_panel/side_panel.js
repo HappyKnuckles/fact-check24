@@ -13,32 +13,40 @@ chrome.runtime.onMessage.addListener(({ target, type, transcript }) => {
   }
 });
 
+const languageSelect = document.getElementById("language-select");
+languageSelect.addEventListener("change", () => {
+  chrome.runtime.sendMessage({
+    type: "set-language",
+    languageCode: languageSelect.value,
+  });
+});
+
 function addFactCard(
   descriptionText,
-  title = 'Transcribed Segment',
-  sourceUrl = '#',
-  cardClass = 'card-true'
+  title = "Transcribed Segment",
+  sourceUrl = "#",
+  cardClass = "card-true"
 ) {
-  const container = document.getElementById('cards-container');
+  const container = document.getElementById("cards-container");
 
   if (container) {
-    const cardDiv = document.createElement('div');
-    cardDiv.classList.add('card', cardClass);
+    const cardDiv = document.createElement("div");
+    cardDiv.classList.add("card", cardClass);
 
-    const titleH2 = document.createElement('h2');
-    titleH2.classList.add('fact-title');
+    const titleH2 = document.createElement("h2");
+    titleH2.classList.add("fact-title");
     titleH2.textContent = title;
 
-    const descriptionP = document.createElement('p');
-    descriptionP.classList.add('fact-description');
+    const descriptionP = document.createElement("p");
+    descriptionP.classList.add("fact-description");
     descriptionP.textContent = descriptionText;
 
-    const sourceA = document.createElement('a');
-    sourceA.classList.add('fact-source');
+    const sourceA = document.createElement("a");
+    sourceA.classList.add("fact-source");
     sourceA.href = sourceUrl;
-    sourceA.textContent = 'source';
-    sourceA.target = '_blank';
-    sourceA.rel = 'noopener noreferrer';
+    sourceA.textContent = "source";
+    sourceA.target = "_blank";
+    sourceA.rel = "noopener noreferrer";
 
     cardDiv.appendChild(titleH2);
     cardDiv.appendChild(descriptionP);
@@ -54,7 +62,7 @@ function addFactCard(
     container.scrollTop = container.scrollHeight;
   } else {
     console.error(
-      'Card container element (#cards-container) not found in side panel.'
+      "Card container element (#cards-container) not found in side panel."
     );
   }
 }
