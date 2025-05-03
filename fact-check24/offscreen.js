@@ -38,22 +38,22 @@ function connectToWebSocket() {
     // all your server messages are JSON, so:
     let msg;
     try {
+
       msg = JSON.parse(event.data);
     } catch (err) {
       console.warn("Non-JSON ws message:", event.data);
       return;
     }
-
-    if (msg.transcript) {
-      console.log("🗣️ Transcript from server:", msg.transcript);
-
-      // if you want to forward it back through the extension messaging:
-      chrome.runtime.sendMessage({
-        target: "audio-transcript",
-        type: "transcript",
-        transcript: msg.transcript,
-      });
-    }
+    console.log("WebSocket message:", msg);
+    msg.forEach((m) => {
+      if(m.statement){
+        chrome.runtime.sendMessage({
+          target: "audio-transcript",
+          type: "transcript",
+          factCheckMessage: m,
+      })
+    }});
+  
     if (msg.error) {
       console.error("Server error:", msg.error);
     }

@@ -3,20 +3,33 @@
 //   // log(msg.bits.slice(0, 10).join(" "));
 // });
 
-chrome.runtime.onMessage.addListener(({ target, type, transcript }) => {
-  if (target === "audio-transcript" && type === "transcript") {
-    const outputElement = document.querySelector("#audio-transcript-output");
-    if (outputElement) {
-      outputElement.textContent += transcript;
+chrome.runtime.onMessage.addListener(({ target, type, factCheckMessage }) => {
+  if (target === 'audio-transcript' && type === 'transcript') {
+    // const outputElement = document.querySelector("#audio-transcript-output");
+    // if (outputElement) {
+    //   outputElement.textContent += transcript;
+    // }
+    console.log('Received transcript:', factCheckMessage);
+    if (factCheckMessage.verified !== 'no_fact_found') {
+      console.log("checked message", factCheckMessage);
+      let cardClass = 'card-false';
+      if (factCheckMessage.verified === 'verified_fact') {
+        cardClass = 'card-true';
+      }
+      addFactCard(
+        factCheckMessage.corrected,
+        factCheckMessage.statement,
+        factCheckMessage.sources,
+        cardClass
+      );
     }
-    addFactCard(transcript);
   }
 });
 
 function addFactCard(
   descriptionText,
   title = 'Transcribed Segment',
-  sourceUrl = '#',
+  sourceUrls = ['#'],
   cardClass = 'card-true'
 ) {
   const container = document.getElementById('cards-container');
@@ -33,16 +46,31 @@ function addFactCard(
     descriptionP.classList.add('fact-description');
     descriptionP.textContent = descriptionText;
 
-    const sourceA = document.createElement('a');
-    sourceA.classList.add('fact-source');
-    sourceA.href = sourceUrl;
-    sourceA.textContent = 'source';
-    sourceA.target = '_blank';
-    sourceA.rel = 'noopener noreferrer';
+    cardDiv.appendChild(descriptionP);
+    descriptionP.appendChild(document.createElement('hr'));
+
+    // Create a span to hold the source links
+    const sourcesSpan = document.createElement('span');
+    sourcesSpan.classList.add('fact-source');
+
+    sourceUrls.forEach((url, index) => {
+      const sourceA = document.createElement('a');
+      sourceA.href = url;
+      sourceA.textContent = url;
+      sourceA.target = '_blank';
+      sourceA.rel = 'noopener noreferrer';
+
+      sourcesSpan.appendChild(sourceA);
+      // Add comma between links, but not after the last one
+      if (index < sourceUrls.length - 1) {
+        sourcesSpan.appendChild(document.createTextNode(', '));
+        sourcesSpan.appendChild(document.createElement('br'));
+      }      
+    });
 
     cardDiv.appendChild(titleH2);
     cardDiv.appendChild(descriptionP);
-    cardDiv.appendChild(sourceA);
+    cardDiv.appendChild(sourcesSpan);
 
     const maxCards = 20;
     while (container.childNodes.length >= maxCards) {
@@ -50,7 +78,6 @@ function addFactCard(
     }
 
     container.appendChild(cardDiv);
-
     container.scrollTop = container.scrollHeight;
   } else {
     console.error(
@@ -58,3 +85,4 @@ function addFactCard(
     );
   }
 }
+
