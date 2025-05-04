@@ -1,0 +1,51 @@
+.card {
+  background-repeat: no-repeat;
+  background-position: bottom 10px right 10px;
+  background-size: 30px;
+  /* box-shadow: 0 4px 12px var(--card-shadow); */
+  border-radius: var(--card-radius);
+  padding: var(--padding);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card.card-true {
+  background-color: var(--true-color);
+}
+
+.card.card-false {
+  background-color: var(--false-color);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  /* box-shadow: 0 6px 18px var(--card-shadow); */
+}
+
+.fact-title {
+  font-size: .9rem;
+  font-style: italic;
+  line-height: 1.35;
+  margin: 0 0 8px;
+  color: var(--text-color);
+}
+
+.fact-description {
+  font-size: 0.8rem;
+  line-height: 1.35;
+  margin: 0 0 12px;
+  color: var(--text-color);
+}
+
+.fact-source {
+  font-size: 0.75rem;
+  text-decoration: none;
+  font-style: italic;
+  color: var(--primary-color);
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.fact-source:hover {
+  color: var(--link-hover);
+  text-decoration: underline;
+}

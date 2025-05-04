@@ -1,0 +1,85 @@
+:root {
+  --padding: 14px;
+  --card-bg: #ffffff;
+  --card-shadow: rgba(0, 0, 0, 0.1);
+  --card-radius: 12px;
+  --primary-color: #022d94;
+  --text-color: #333333;
+  --link-hover: rgb(13, 0, 88);
+  --true-color: #d5f6ed;
+  --false-color: #f6d5d5;
+  --font-family: "Verdana", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  padding: var(--padding);
+  font-family: var(--font-family);
+  background: #f5f7fa;
+  display: flex;
+  flex-direction: column;
+}
+button:disabled,
+button[disabled] {
+  background-color: #cccccc !important;
+  color: #666666 !important;
+  cursor: not-allowed !important;
+}
+
+.buttons-container {
+  display: flex;
+  justify-content: space-between;
+}
+#start-check,
+#stop-check {
+  width: 48%;
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+#cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem; /* spacing between columns */
+  width: 100%; /* full-width */
+  max-width: 600px; /* or whatever fits your design */
+  margin: 0 auto; /* center on the page if you like */
+  padding: 1rem;
+}
+
+.stat {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center; /* center “True” + “0” vertically & horizontally */
+}
+
+.stat h2 {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 300;
+}
+
+.stat p {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.stat-percentage {
+  color: #9f9f9f;
+  font-weight: 300!important;
+}
