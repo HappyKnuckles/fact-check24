@@ -3,6 +3,13 @@
 **GenDev2025 Hackathon Submission**  
 *Check24, Vienna*  
 
+## Team
+
+- [Leonardo Palomino](https://github.com/leomino)
+- [Emanuele Salonico](https://github.com/esalonico)
+- [Me](https://github.com/happyknuckles)
+
+
 ---
 
 ## 🎯 Goal
@@ -49,12 +56,12 @@ In the era of rampant misinformation and propaganda, FactCHECK24 empowers users 
 ## 🧠 How It Works
 ```mermaid
 flowchart LR
-  A[Browser Tab Audio] -->|WebSocket| B(Audio Ingest Server)
-  B --> C[Speech-to-Text]
-  C --> D[Text Buffer (30 words)]
-  D --> E[Google Gemini Fact Check]
-  E --> F[Result: True / False + Sources]
-  F --> G[Extension Side Panel]
+  A["Browser Tab Audio"] -->|WebSocket| B["Audio Ingest Server"]
+  B --> C["Speech-to-Text"]
+  C --> D["Text Buffer (30 words)"]
+  D --> E["Google Gemini Fact Check"]
+  E --> F["Result: True / False + Sources"]
+  F --> G["Extension Side Panel"]
 ```
 
 ## 📈 Outlook & Next Steps
