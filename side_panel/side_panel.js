@@ -3,7 +3,7 @@ let rightCounter = 0;
 
 chrome.runtime.onMessage.addListener(({ target, type, factCheckMessage }) => {
   if (target === 'side-panel' && type === 'fact-check') {
-    console.log('Received transcript:', factCheckMessage);
+    console.log('Received fact:', factCheckMessage);
     if (factCheckMessage.verified !== 'no_fact_found') {
       console.log("checked message", factCheckMessage);
       let cardClass = 'card-false';
